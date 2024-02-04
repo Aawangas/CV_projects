@@ -1,5 +1,5 @@
 # Try to implement the model from my own understanding
-
+import math
 import torch
 from torch import matmul
 
@@ -17,30 +17,38 @@ class EncoderDecoder(torch.nn.modules):
         return self.decoder(x)
 """
 
-# start with specific functions
+def clones(module, N):
+    "Produce N identical layers."
+    return torch.nn.ModuleList([torch.copy.deepcopy(module) for _ in range(N)])
 
-def attention(q,k,v,d_v):
-    # This fucntion is used to compute the attention matrix of give matrixs
 
-    weight_matrix = torch.functional.softmax(torch.matmul(q,k.troch.transpose(0,1))/torch.sqrt(d_v))
-    return weight_matrix.torch.matmul(v)
 
-def multiheadattention(x,linear_layers,w_0,d_v):
-    """
+class multiheadattention(torch.nn.modules):
+    def __init__(self,linear_layers,w_0):
+        super.__init__(multiheadattention,self)
+        self.linear_layers = linear_layers
+        self.w_0 = w_0
+
+    def forward(self,x):
+        """
     x is the input matrix and linear_layers are a list of linear layer with the shape of (num_head,3)
     """
-    attention = []
-    for layer_batch in linear_layers:
-        attention.append(attention(
-            x.matmul(layer_batch[0]),
-            x.matmul(layer_batch[1]),
-            x.matmul(layer_batch[2]),
-            d_v))
-    # now the attention should be a list of n*dv matrix, we should concracate them such that get a n,dv*h matrix 
+        attention = []
+        for layer_batch in self.linear_layers:
+            attention.append(attention(
+                x.matmul(layer_batch[0]),
+                x.matmul(layer_batch[1]),
+                x.matmul(layer_batch[2]),
+                math.sqrt(x.shape[1])))
+        # now the attention should be a list of n*dv matrix, we should concracate them such that get a n,dv*h matrix 
     
-    con_attention = torch.cat(attention, dim=1)
+        con_attention = torch.cat(attention, dim=1)
 
-    return con_attention.matmul(w_0)
+        return con_attention.matmul(self.w_0)
+
+
+
+
 
 
 
